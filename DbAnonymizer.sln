@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbAnonymizer.Console", "DbAnonymizer.Console\DbAnonymizer.Console.csproj", "{6CE726FC-D371-45F3-BFAA-D994504F582D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{CC6017E2-379A-465C-8C8C-199F1E858D5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbAnonymizer.Tests", "DbAnonymizer.Tests\DbAnonymizer.Tests.csproj", "{8D6A81C8-A0C0-4C0D-B2FB-A71238EA503F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6CE726FC-D371-45F3-BFAA-D994504F582D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CE726FC-D371-45F3-BFAA-D994504F582D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CE726FC-D371-45F3-BFAA-D994504F582D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CE726FC-D371-45F3-BFAA-D994504F582D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D6A81C8-A0C0-4C0D-B2FB-A71238EA503F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D6A81C8-A0C0-4C0D-B2FB-A71238EA503F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D6A81C8-A0C0-4C0D-B2FB-A71238EA503F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D6A81C8-A0C0-4C0D-B2FB-A71238EA503F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8D6A81C8-A0C0-4C0D-B2FB-A71238EA503F} = {CC6017E2-379A-465C-8C8C-199F1E858D5C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6DE32121-E4FA-4062-9782-6711F5049690}
+	EndGlobalSection
+EndGlobal
