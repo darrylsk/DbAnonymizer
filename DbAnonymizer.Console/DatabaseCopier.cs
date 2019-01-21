@@ -390,11 +390,11 @@ namespace DbAnonymizer.Console
         private void CopyTableData(Table originalTable)
         {
 
-            // Todo: Cannot copy HierarchyId or Geography column data (and probably not Geometry, but haven't tried) .
+            // Todo: Cannot copy HierarchyId or Geography column data (and probably not Geometry, but haven't tried).
             // Just avoid copying certain types of columns until/unless we can figure out a way to read them.
             // * The DataReader object seems to choke on HierarchyId and Geography.
-            // * The DataAdapter seems to have trouble with user defined types based on nvarchar(1) as evidenced with the flag and NameStyle types
-            //   in the AdventureWorks2017 database.
+            // * The DataAdapter seems to have trouble with user defined types based on nvarchar(1) as evidenced with the 
+            //   Flag and NameStyle types in the AdventureWorks2017 database.
 
             var selectList = SelectListBuilder(originalTable);
 
@@ -402,7 +402,7 @@ namespace DbAnonymizer.Console
                 ? $"select top {MaxRows} {selectList} from {originalTable.Schema}.{originalTable.Name}"
                 : $"select {selectList} from {originalTable.Schema}.{originalTable.Name}";
 
-            // Note: For now, shrinkage should be uses with caution as it can cause very bad performance
+            // Note: For now, shrinkage should be used with caution as it can cause very bad performance
             // and heavy memory use.
             if (MaxRows == 0 && Shrinkage > 0) // MaxRows overrides Shrinkage factor if both are set.
             {
@@ -535,7 +535,7 @@ namespace DbAnonymizer.Console
                         row.SetField(column, fieldLength.RandomStringOfLength(StringStyles.Numeric));
                         break;
                     case "Flag":
-                        // Todo: DataTable column type comes out as int32 instead of string/char.   Need to fix.
+                        // Todo: DataTable column type comes out as int32 instead of string/char.  Need to fix.
                         break;
                     case "Name":
                         row.SetField(column, fieldLength.RandomStringOfLength(StringStyles.AlphaUpper));
@@ -586,7 +586,7 @@ namespace DbAnonymizer.Console
 
                     var ds2 = _originalDatabase.ExecuteWithResults(select);
 
-                    // Recursively call this method to add rows to the deepest referenced tab
+                    // Recursively call this method to add rows to the deepest referenced table.
                     if (fkTable.ForeignKeys.Count > 0)
                         AddRelatedRecords(ds2, fkTable, destConnection);
 
@@ -602,7 +602,7 @@ namespace DbAnonymizer.Console
                     }
                     var copyAdapter = new SqlDataAdapter(select, destConnection);
 
-                    // Generate a SQL insert command based on the current table defination.
+                    // Generate a SQL insert command based on the current table definition.
                     var commandBuilder = new SqlCommandBuilder(copyAdapter);
                     copyAdapter.InsertCommand = commandBuilder.GetInsertCommand();
 
