@@ -9,7 +9,7 @@ There are lots of improvements that could be made, including:
 * some datatypes that are difficult for the DataReader (exempli gratia, Geography and HierarchyID) that I've left out
 * things I forgot
 
-Because of the performance issue, the tool is only practical for copying a small sample of database records (unless you have a lot of patience and computer memory) but this should suffice for a test database, which is the only purpose for creating this tool
+Because of the performance issue, the tool is only practical for copying a small sample of database records (unless you have a lot of patience and computer memory) but this should suffice for a test database, which is it's only purpose.
 
 Pull requests are encouraged.  Please push your changes to a feature branch.
 
