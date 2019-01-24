@@ -82,6 +82,53 @@ namespace DbAnonymizer.Console
                 copyXmlSchemaCollection.Create();
             }
 
+            // Copy all user-defined types
+            foreach (UserDefinedDataType srctype in _originalDatabase.UserDefinedDataTypes)
+            {
+                var copyType = new UserDefinedDataType(_copyDatabase, srctype.Name)
+                {
+                    Length = srctype.MaxLength,
+                    SystemType = srctype.SystemType
+                };
+                copyType.Create();
+            }
+
+            // Copy all stored procedures
+            var spList = new List<StoredProcedure>();
+            foreach (StoredProcedure originalsp in _originalDatabase.StoredProcedures)
+            {
+                spList.Add(originalsp);
+            }
+
+
+            foreach (StoredProcedure originalProc in spList.Where(f => f.Schema != "sys"))
+            {
+                var copysp = new StoredProcedure(_copyDatabase, originalProc.Name)
+                {
+                    Owner = originalProc.Owner,
+                    QuotedIdentifierStatus = originalProc.QuotedIdentifierStatus,
+                    Schema = originalProc.Schema,
+                    TextBody = originalProc.TextBody,
+                    TextHeader = originalProc.TextHeader,
+                    TextMode = false,
+                    MethodName = originalProc.MethodName,
+                    UserData = originalProc.UserData,
+                    IsSchemaBound = originalProc.IsSchemaBound,
+                    IsNativelyCompiled = originalProc.IsNativelyCompiled,
+                    ClassName = originalProc.ClassName,
+                    IsEncrypted = originalProc.IsEncrypted,
+                    Startup = originalProc.Startup
+                };
+
+                foreach (Parameter srcparam in originalProc.Parameters)
+                {
+                    var param = new StoredProcedureParameter(copysp, srcparam.Name, srcparam.DataType);
+                    copysp.Parameters.Add(param);
+                }
+
+                copysp.Create();
+            }
+
             // Copy any/all user defined functions.
             var udfList = new List<UserDefinedFunction>();
             foreach (UserDefinedFunction originalFunction in _originalDatabase.UserDefinedFunctions)
@@ -92,16 +139,18 @@ namespace DbAnonymizer.Console
             // Copy all functions
             foreach (UserDefinedFunction originalFunction in udfList.Where(f => f.Schema != "sys"))
             {
-                var copyFunction = new UserDefinedFunction(_copyDatabase, originalFunction.Name);
-                copyFunction.Owner = originalFunction.Owner;
-                copyFunction.QuotedIdentifierStatus = originalFunction.QuotedIdentifierStatus;
-                copyFunction.Schema = originalFunction.Schema;
-                copyFunction.TextBody = originalFunction.TextBody;
-                copyFunction.TextHeader = originalFunction.TextHeader;
-                copyFunction.TextMode = false;
-                copyFunction.MethodName = originalFunction.MethodName;
-                copyFunction.TableVariableName = originalFunction.TableVariableName;
-                copyFunction.UserData = originalFunction.UserData;
+                var copyFunction = new UserDefinedFunction(_copyDatabase, originalFunction.Name)
+                {
+                    Owner = originalFunction.Owner,
+                    QuotedIdentifierStatus = originalFunction.QuotedIdentifierStatus,
+                    Schema = originalFunction.Schema,
+                    TextBody = originalFunction.TextBody,
+                    TextHeader = originalFunction.TextHeader,
+                    TextMode = false,
+                    MethodName = originalFunction.MethodName,
+                    TableVariableName = originalFunction.TableVariableName,
+                    UserData = originalFunction.UserData
+                };
                 copyFunction.Schema = originalFunction.Schema;
                 copyFunction.ImplementationType = originalFunction.ImplementationType;
                 copyFunction.IsEncrypted = originalFunction.IsEncrypted;
@@ -132,7 +181,7 @@ namespace DbAnonymizer.Console
                 copyFunction.Create();
             }
 
-            // Copy all Table Definitions and Data
+            // Copy all Table Definitions.
             var n = 0; var tableCount = OriginalDatabase.Tables.Count;
 
             // Make sure that the tables having no foreign keys are copied first.
@@ -146,6 +195,7 @@ namespace DbAnonymizer.Console
                 CopyTableDefinitions(originalTable);
             }
 
+            // Copy all foregin keys
             n = 0;
             foreach (Table originalTable in originalTableList)
             {
@@ -153,6 +203,9 @@ namespace DbAnonymizer.Console
                 CopyForeignKeys(originalTable);
             }
 
+            // Copy all triggers
+
+            // Copy data samples from each table - resolve foregin key relationships along the way.
             var sourceConnection = new ServerConnection(_connectionInfo) { DatabaseName = _originalDatabaseName }.SqlConnectionObject;
             var destConnection = new ServerConnection(_connectionInfo) { DatabaseName = _copyDatabaseName }.SqlConnectionObject;
             n = 0;
@@ -178,7 +231,6 @@ namespace DbAnonymizer.Console
 
         private void CopyForeignKeys(Table originalTable)
         {
-            //var copyTable = new Table(_copyDatabase, originalTable.Name, originalTable.Schema);
             var copyTable = _copyDatabase.Tables[originalTable.Name, originalTable.Schema];
 
             foreach (ForeignKey origfk in originalTable.ForeignKeys)
@@ -303,9 +355,11 @@ namespace DbAnonymizer.Console
                 Column copyColumn;
                 if (_copyDatabase.UserDefinedDataTypes[originalColumn.DataType.Name] == null && _originalDatabase.UserDefinedDataTypes[originalColumn.DataType.Name] != null)
                 {
-                    var copyType = new UserDefinedDataType(_copyDatabase, originalColumn.DataType.Name);
-                    copyType.Length = originalColumn.DataType.MaximumLength;
-                    copyType.SystemType = "nvarchar";
+                    var copyType = new UserDefinedDataType(_copyDatabase, originalColumn.DataType.Name)
+                    {
+                        Length = originalColumn.DataType.MaximumLength,
+                        SystemType = "nvarchar"
+                    };
                     copyType.Create();
 
                     copyColumn = new Column(copyTable, originalColumn.Name, DataType.UserDefinedDataType(copyType.Name));
