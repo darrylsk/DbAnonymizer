@@ -191,7 +191,7 @@ namespace DbAnonymizer.Console
 
             foreach (Table originalTable in originalTableList)
             {
-                WriteLine($"Copying basic table definition for table: {originalTable.Schema}.{originalTable.Name} ({++n} of {tableCount})");
+                n = LogAction(n, "Copying basic table definition for table:", tableCount, originalTable);
                 CopyTableDefinitions(originalTable);
             }
 
@@ -223,7 +223,7 @@ namespace DbAnonymizer.Console
                 var row = dataTable.Rows[0];
                 var count = (int)row[0];
 
-                Write($"Copying table data: {originalTable.Schema}.{originalTable.Name} ({++n} of {tableCount}) ({count:000,000} rows)");
+                n = LogActionWithCount(n, "Copying table data", tableCount, originalTable, count);
 
                 CopyTableData(originalTable);
                 WriteLine();
@@ -233,6 +233,18 @@ namespace DbAnonymizer.Console
             destConnection.Close();
             destConnection.Dispose();
 
+        }
+
+        private static int LogActionWithCount(int n, string message, int tableCount, Table originalTable, int count)
+        {
+            Write($"{message}: {originalTable.Schema}.{originalTable.Name} ({++n} of {tableCount}) ({count,6:###,###} rows)");
+            return n;
+        }
+
+        private static int LogAction(int n, string message, int tableCount, Table originalTable)
+        {
+            WriteLine($"{message}: {originalTable.Schema}.{originalTable.Name} ({++n} of {tableCount})");
+            return n;
         }
 
         private void CopyTriggers(Table originalTable)
@@ -538,7 +550,7 @@ namespace DbAnonymizer.Console
 
                     row.SetAdded();
                     if (++rowct > 1000) return;
-                    Write($"{rowct:000,000}\x08\x08\x08\x08\x08\x08\x08");
+                    Write($"{rowct,6:###,###}\x08\x08\x08\x08\x08\x08\x08");
                     foreach (DataColumn column in dataTable.Columns)
                     {
                         AnonomizeColumn(originalTable, row, column);
