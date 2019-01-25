@@ -191,7 +191,7 @@ namespace DbAnonymizer.Console
 
             foreach (Table originalTable in originalTableList)
             {
-                WriteLine($"Creating table: {originalTable.Schema}.{originalTable.Name} ({++n} of {tableCount})");
+                WriteLine($"Copying basic table definition for table: {originalTable.Schema}.{originalTable.Name} ({++n} of {tableCount})");
                 CopyTableDefinitions(originalTable);
             }
 
@@ -199,11 +199,17 @@ namespace DbAnonymizer.Console
             n = 0;
             foreach (Table originalTable in originalTableList)
             {
-                WriteLine($"Creating foregin keys for table: {originalTable.Schema}.{originalTable.Name} ({++n} of {tableCount})");
+                WriteLine($"Copying foregin keys for table: {originalTable.Schema}.{originalTable.Name} ({++n} of {tableCount})");
                 CopyForeignKeys(originalTable);
             }
 
             // Copy all triggers
+            n = 0;
+            foreach (Table originalTable in originalTableList)
+            {
+                WriteLine($"Copying triggers for table: {originalTable.Schema}.{originalTable.Name} ({++n} of {tableCount})");
+                CopyTriggers(originalTable);
+            }
 
             // Copy data samples from each table - resolve foregin key relationships along the way.
             var sourceConnection = new ServerConnection(_connectionInfo) { DatabaseName = _originalDatabaseName }.SqlConnectionObject;
@@ -227,6 +233,34 @@ namespace DbAnonymizer.Console
             destConnection.Close();
             destConnection.Dispose();
 
+        }
+
+        private void CopyTriggers(Table originalTable)
+        {
+            var copyTable = _copyDatabase.Tables[originalTable.Name, originalTable.Schema];
+
+            foreach (Trigger origtr in originalTable.Triggers)
+            {
+                var copytr = new Trigger(copyTable, origtr.Name)
+                {
+                    TextMode = false,
+                    Insert = origtr.Insert,
+                    InsertOrder = origtr.InsertOrder,
+                    Delete = origtr.Delete,
+                    DeleteOrder = origtr.DeleteOrder,
+                    Update = origtr.Update,
+                    UpdateOrder = origtr.UpdateOrder,
+                    ClassName = origtr.ClassName,
+                    IsSchemaBound = origtr.IsSchemaBound, 
+                    IsEnabled = origtr.IsEnabled,
+                    QuotedIdentifierStatus = origtr.QuotedIdentifierStatus,
+                    MethodName = origtr.MethodName,
+                    UserData = origtr.UserData
+                };
+
+                copytr.TextBody = origtr.TextBody;
+                copytr.Create();
+            }
         }
 
         private void CopyForeignKeys(Table originalTable)
